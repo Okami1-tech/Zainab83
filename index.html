@@ -2,489 +2,688 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07050c">
-<title>For Hayati — Stay Here</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      viewport-fit=cover">
+<meta name="theme-color" content="#07030d">
+<title>For Hayati</title>
 
 <style>
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
   -webkit-tap-highlight-color:transparent;
 }
 
 :root{
-  --bg:#07050c;
-  --purple:#a982ff;
-  --pink:#ff9dcc;
-  --soft:#eadff3;
-  --muted:#9b8da7;
+  --black:#050308;
+  --deep:#090510;
+  --purple:#9b4dff;
+  --purple2:#6c2bd9;
+  --pink:#ff5ca8;
+  --white:#fff;
+  --muted:#b9afc3;
 }
 
 html,body{
-  margin:0;
   width:100%;
-  min-height:100%;
-  background:var(--bg);
+  height:100%;
+  overflow:hidden;
+  background:var(--black);
   color:white;
-  font-family:Georgia,"Times New Roman",serif;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 body{
-  min-height:100svh;
-  overflow:hidden;
+  overscroll-behavior:none;
 }
 
 button{
+  border:0;
+  outline:0;
   font:inherit;
   color:inherit;
-  border:0;
-  background:none;
   cursor:pointer;
 }
 
-#room{
+#app{
   position:fixed;
   inset:0;
+  width:100%;
+  height:100dvh;
+  min-height:100svh;
   overflow:hidden;
   background:
-    radial-gradient(circle at 50% 48%,
-      rgba(155,105,220,.11),
-      transparent 28%),
-    radial-gradient(circle at 50% 90%,
-      rgba(255,130,190,.045),
-      transparent 40%),
-    #07050c;
-  transition:background 2s ease;
+    radial-gradient(circle at 50% 35%, rgba(126,48,220,.16), transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(255,50,150,.06), transparent 30%),
+    #050308;
 }
 
-/* ------------------------------
-   QUIET PARTICLES
---------------------------------*/
-.particles{
+/* =========================
+   SCENE SYSTEM
+========================= */
+
+.scene{
   position:absolute;
   inset:0;
+  width:100%;
+  height:100%;
+  height:100dvh;
+  min-height:100svh;
+
+  display:flex;
+  flex-direction:column;
+
+  opacity:0;
+  visibility:hidden;
   pointer-events:none;
-  opacity:.5;
+
+  transform:scale(1.025);
+
+  transition:
+    opacity .7s ease,
+    transform .9s cubic-bezier(.2,.8,.2,1),
+    visibility .7s;
 }
+
+.scene.active{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:scale(1);
+}
+
+/* =========================
+   INTRO
+========================= */
+
+#intro{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:
+    max(28px, env(safe-area-inset-top))
+    26px
+    max(30px, env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+
+.intro-orb{
+  position:absolute;
+  width:65vw;
+  height:65vw;
+  max-width:360px;
+  max-height:360px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+      rgba(170,90,255,.20),
+      rgba(155,77,255,.05) 42%,
+      transparent 70%);
+  filter:blur(8px);
+  animation:orbPulse 5s ease-in-out infinite;
+}
+
+@keyframes orbPulse{
+  0%,100%{transform:scale(.9);opacity:.65}
+  50%{transform:scale(1.08);opacity:1}
+}
+
+.intro-content{
+  position:relative;
+  z-index:2;
+  width:min(100%,420px);
+}
+
+.eyebrow{
+  font-size:10px;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  color:#a997b3;
+  margin-bottom:25px;
+}
+
+.intro-title{
+  font-size:clamp(42px,13vw,72px);
+  line-height:.91;
+  font-weight:300;
+  letter-spacing:-.055em;
+}
+
+.intro-title span{
+  display:block;
+}
+
+.intro-title .accent{
+  color:#d6a9ff;
+}
+
+.intro-text{
+  max-width:330px;
+  margin:28px auto 0;
+  color:#aaa0b0;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.enter{
+  margin-top:34px;
+  min-height:54px;
+  padding:0 28px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:100px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(15px);
+  color:white;
+  font-size:11px;
+  letter-spacing:.25em;
+  transition:.3s ease;
+}
+
+.enter:active{
+  transform:scale(.96);
+  background:rgba(155,77,255,.18);
+}
+
+/* =========================
+   MAIN ROOM
+========================= */
+
+#room{
+  overflow:hidden;
+}
+
+.room-top{
+  flex:0 0 auto;
+  padding:
+    max(22px, env(safe-area-inset-top))
+    22px
+    0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.room-label{
+  font-size:9px;
+  letter-spacing:.3em;
+  color:#85788d;
+  text-transform:uppercase;
+}
+
+.clock{
+  font-size:10px;
+  color:#766a7b;
+  letter-spacing:.1em;
+}
+
+.room-center{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.breath{
+  position:relative;
+  width:min(52vw,220px);
+  height:min(52vw,220px);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.breath::before,
+.breath::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:1px solid rgba(183,119,255,.17);
+  animation:breathe 5s ease-in-out infinite;
+}
+
+.breath::after{
+  inset:14%;
+  border-color:rgba(255,92,168,.12);
+  animation-delay:-2.5s;
+}
+
+@keyframes breathe{
+  0%,100%{
+    transform:scale(.78);
+    opacity:.3;
+  }
+  50%{
+    transform:scale(1.05);
+    opacity:1;
+  }
+}
+
+.breath-core{
+  width:32%;
+  height:32%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+      #fff 0%,
+      #d7aaff 12%,
+      #9b4dff 42%,
+      rgba(155,77,255,.15) 72%,
+      transparent 100%);
+  box-shadow:
+    0 0 35px rgba(155,77,255,.65),
+    0 0 100px rgba(155,77,255,.2);
+  animation:core 5s ease-in-out infinite;
+}
+
+@keyframes core{
+  0%,100%{transform:scale(.8)}
+  50%{transform:scale(1.18)}
+}
+
+.breath-word{
+  position:absolute;
+  bottom:8%;
+  left:0;
+  right:0;
+  text-align:center;
+  color:#827587;
+  font-size:10px;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  animation:fadeWord 5s ease-in-out infinite;
+}
+
+@keyframes fadeWord{
+  0%,100%{opacity:.35}
+  50%{opacity:1}
+}
+
+/* =========================
+   TOUCH POINTS
+========================= */
+
+.points{
+  flex:0 0 auto;
+  width:100%;
+  padding:
+    10px 16px
+    max(18px, env(safe-area-inset-bottom));
+}
+
+.points-grid{
+  width:100%;
+  max-width:520px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+}
+
+.point{
+  min-height:62px;
+  padding:11px 12px;
+  border-radius:17px;
+  text-align:left;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.075);
+  transition:
+    transform .25s ease,
+    background .25s ease,
+    border-color .25s ease;
+}
+
+.point:active{
+  transform:scale(.96);
+}
+
+.point.done{
+  border-color:rgba(155,77,255,.42);
+  background:rgba(155,77,255,.08);
+}
+
+.point:last-child{
+  grid-column:1 / -1;
+}
+
+.point-number{
+  font-size:8px;
+  color:#866b99;
+  letter-spacing:.2em;
+}
+
+.point-title{
+  margin-top:6px;
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#ded6e3;
+}
+
+/* =========================
+   MODAL PANEL
+========================= */
+
+#panel{
+  position:absolute;
+  inset:0;
+  z-index:20;
+
+  display:flex;
+  align-items:flex-end;
+
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  visibility:hidden;
+
+  transition:
+    background .4s ease,
+    visibility .4s ease;
+}
+
+#panel.open{
+  background:rgba(0,0,0,.58);
+  pointer-events:auto;
+  visibility:visible;
+}
+
+.panel-sheet{
+  width:100%;
+  max-height:min(82dvh,700px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+
+  padding:
+    12px 22px
+    max(25px, env(safe-area-inset-bottom));
+
+  border-radius:28px 28px 0 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27,16,38,.98),
+      rgba(9,5,14,.99)
+    );
+
+  border:1px solid rgba(255,255,255,.08);
+  border-bottom:0;
+
+  transform:translateY(105%);
+  transition:
+    transform .55s cubic-bezier(.2,.8,.2,1);
+}
+
+#panel.open .panel-sheet{
+  transform:translateY(0);
+}
+
+.handle{
+  width:38px;
+  height:4px;
+  margin:0 auto 24px;
+  border-radius:10px;
+  background:rgba(255,255,255,.18);
+}
+
+.panel-kicker{
+  color:#a775c7;
+  font-size:9px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+}
+
+.panel-title{
+  margin-top:10px;
+  font-size:clamp(26px,8vw,40px);
+  line-height:1.05;
+  font-weight:300;
+  letter-spacing:-.04em;
+}
+
+.panel-text{
+  margin-top:20px;
+  color:#b9afc0;
+  font-size:15px;
+  line-height:1.85;
+}
+
+.panel-close{
+  width:100%;
+  min-height:50px;
+  margin-top:26px;
+  border-radius:15px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:10px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+}
+
+/* =========================
+   FINAL SCENE
+========================= */
+
+#final{
+  overflow-y:auto;
+  overflow-x:hidden;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:
+    max(45px, env(safe-area-inset-top))
+    25px
+    max(45px, env(safe-area-inset-bottom));
+
+  text-align:center;
+}
+
+.final-glow{
+  position:absolute;
+  width:70vw;
+  height:70vw;
+  max-width:430px;
+  max-height:430px;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(155,77,255,.15),
+      transparent 68%
+    );
+  pointer-events:none;
+}
+
+.final-content{
+  position:relative;
+  width:min(100%,430px);
+  margin:auto;
+}
+
+.final-small{
+  color:#a775c7;
+  font-size:9px;
+  letter-spacing:.38em;
+  text-transform:uppercase;
+  margin-bottom:28px;
+}
+
+.final-title{
+  font-size:clamp(38px,11vw,62px);
+  line-height:.95;
+  font-weight:300;
+  letter-spacing:-.055em;
+}
+
+.final-title span{
+  display:block;
+}
+
+.final-copy{
+  margin:30px auto 0;
+  color:#b9afc0;
+  font-size:15px;
+  line-height:1.9;
+  max-width:380px;
+}
+
+.final-copy strong{
+  color:#f0e8f4;
+  font-weight:400;
+}
+
+.signature{
+  margin-top:35px;
+  color:#e6c5ff;
+  font-size:12px;
+  letter-spacing:.16em;
+}
+
+.final-heart{
+  margin:25px auto 0;
+  width:30px;
+  height:30px;
+  position:relative;
+  transform:rotate(-45deg);
+  animation:heartBeat 2.1s ease-in-out infinite;
+}
+
+.final-heart::before,
+.final-heart::after{
+  content:"";
+  position:absolute;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#b46cff,#ff5ca8);
+}
+
+.final-heart::before{
+  top:-15px;
+  left:0;
+}
+
+.final-heart::after{
+  top:0;
+  left:15px;
+}
+
+.final-heart{
+  background:linear-gradient(135deg,#b46cff,#ff5ca8);
+}
+
+@keyframes heartBeat{
+  0%,100%{transform:rotate(-45deg) scale(.85)}
+  15%{transform:rotate(-45deg) scale(1)}
+  30%{transform:rotate(-45deg) scale(.9)}
+  45%{transform:rotate(-45deg) scale(1)}
+}
+
+/* =========================
+   PARTICLES
+========================= */
 
 .particle{
   position:absolute;
   width:2px;
   height:2px;
   border-radius:50%;
-  background:#d9c5ff;
-  opacity:.25;
-  animation:float 8s infinite ease-in-out;
+  background:#d7b4ff;
+  opacity:.35;
+  animation:float linear infinite;
+  pointer-events:none;
 }
 
 @keyframes float{
-  0%,100%{transform:translateY(0);opacity:.15}
-  50%{transform:translateY(-20px);opacity:.5}
+  from{
+    transform:translateY(110vh);
+    opacity:0;
+  }
+  15%{opacity:.4}
+  85%{opacity:.4}
+  to{
+    transform:translateY(-15vh);
+    opacity:0;
+  }
 }
 
-/* ------------------------------
-   TOP
---------------------------------*/
-.top{
-  position:absolute;
-  top:max(22px,env(safe-area-inset-top));
-  left:0;
-  right:0;
-  padding:0 22px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:20;
-  font:8px Arial,sans-serif;
-  letter-spacing:3px;
-  color:#84768f;
-}
+/* =========================
+   SMALL SCREENS
+========================= */
 
-.clock{
-  color:#d7cce0;
-  letter-spacing:1px;
-}
+@media(max-height:650px){
 
-/* ------------------------------
-   INTRO
---------------------------------*/
-.intro{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding:30px;
-  text-align:center;
-  z-index:10;
-  transition:
-    opacity 1.2s ease,
-    transform 1.2s ease,
-    visibility 1.2s;
-}
-
-.intro.hidden{
-  opacity:0;
-  transform:scale(1.04);
-  visibility:hidden;
-}
-
-.intro .tiny{
-  font:8px Arial,sans-serif;
-  letter-spacing:5px;
-  color:var(--pink);
-  margin-bottom:25px;
-}
-
-.intro h1{
-  font-size:clamp(42px,12vw,70px);
-  line-height:.95;
-  font-weight:normal;
-  letter-spacing:-2px;
-  margin:0;
-}
-
-.intro h1 span{
-  color:var(--pink);
-}
-
-.intro p{
-  max-width:380px;
-  color:#afa1b9;
-  font-size:15px;
-  line-height:1.9;
-  margin:25px auto 35px;
-}
-
-.enter{
-  padding:16px 27px;
-  border:1px solid rgba(255,157,204,.25);
-  border-radius:40px;
-  background:rgba(255,157,204,.055);
-  font:9px Arial,sans-serif;
-  letter-spacing:3px;
-  transition:.4s;
-}
-
-.enter:active{
-  transform:scale(.95);
-  background:rgba(255,157,204,.12);
-}
-
-/* ------------------------------
-   MAIN SPACE
---------------------------------*/
-.space{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  visibility:hidden;
-  transition:opacity 1.4s ease;
-}
-
-.space.visible{
-  opacity:1;
-  visibility:visible;
-}
-
-/* central breathing light */
-
-.core{
-  position:absolute;
-  left:50%;
-  top:44%;
-  transform:translate(-50%,-50%);
-  width:180px;
-  height:180px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:
-    width 1s ease,
-    height 1s ease,
-    top 1s ease;
-}
-
-.core:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  background:radial-gradient(
-    circle,
-    rgba(255,174,216,.7) 0%,
-    rgba(179,130,255,.18) 32%,
-    transparent 70%
-  );
-  filter:blur(5px);
-  animation:breathe 5s ease-in-out infinite;
-}
-
-.core:after{
-  content:"";
-  position:absolute;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:#fff;
-  box-shadow:
-    0 0 15px #ffd9ed,
-    0 0 40px rgba(190,135,255,.8);
-  animation:breatheDot 5s ease-in-out infinite;
-}
-
-@keyframes breathe{
-  0%,100%{transform:scale(.72);opacity:.55}
-  50%{transform:scale(1.12);opacity:1}
-}
-
-@keyframes breatheDot{
-  0%,100%{transform:scale(.75)}
-  50%{transform:scale(1.15)}
-}
-
-.breatheText{
-  position:absolute;
-  top:calc(44% + 110px);
-  width:100%;
-  text-align:center;
-  font:9px Arial,sans-serif;
-  letter-spacing:4px;
-  color:#887a94;
-  transition:opacity .6s;
-}
-
-.breatheText strong{
-  display:block;
-  font:17px Georgia,serif;
-  letter-spacing:0;
-  color:#d8ccdf;
-  margin-bottom:8px;
-}
-
-/* ------------------------------
-   DISCOVERY BUTTONS
---------------------------------*/
-.touch{
-  position:absolute;
-  width:88px;
-  min-height:65px;
-  padding:8px;
-  text-align:center;
-  z-index:8;
-  opacity:.75;
-  transition:
-    opacity .5s,
-    transform .5s,
-    color .5s;
-}
-
-.touch:hover{
-  opacity:1;
-}
-
-.touch:active{
-  transform:scale(.9);
-}
-
-.touch .dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  margin:auto auto 9px;
-  background:var(--pink);
-  box-shadow:0 0 14px var(--pink);
-}
-
-.touch small{
-  display:block;
-  font:8px Arial,sans-serif;
-  letter-spacing:1.5px;
-  color:#a99bad;
-  line-height:1.4;
-}
-
-.touch.used{
-  opacity:.35;
-}
-
-#care{left:5%;top:25%}
-#hide{right:4%;top:25%}
-#stay{left:5%;bottom:25%}
-#tears{right:4%;bottom:25%}
-#dua{left:50%;bottom:9%;transform:translateX(-50%)}
-
-/* ------------------------------
-   MESSAGE PANEL
---------------------------------*/
-.panel{
-  position:absolute;
-  left:50%;
-  bottom:25px;
-  transform:translateX(-50%) translateY(20px);
-  width:min(88%,440px);
-  padding:24px 22px 25px;
-  border-radius:24px;
-  border:1px solid rgba(226,191,255,.13);
-  background:rgba(15,10,22,.86);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  text-align:center;
-  opacity:0;
-  visibility:hidden;
-  transition:
-    opacity .6s,
-    transform .6s,
-    visibility .6s;
-  z-index:15;
-}
-
-.panel.show{
-  opacity:1;
-  visibility:visible;
-  transform:translateX(-50%) translateY(0);
-}
-
-.panel .tag{
-  font:8px Arial,sans-serif;
-  letter-spacing:4px;
-  color:var(--pink);
-}
-
-.panel h2{
-  font-size:27px;
-  font-weight:normal;
-  line-height:1.15;
-  margin:13px 0;
-}
-
-.panel p{
-  margin:0;
-  color:#d3c7db;
-  font-size:15px;
-  line-height:1.85;
-  white-space:pre-line;
-}
-
-.panel .close{
-  margin-top:17px;
-  font:8px Arial,sans-serif;
-  letter-spacing:2px;
-  color:#897b94;
-}
-
-/* ------------------------------
-   FINAL
---------------------------------*/
-.final{
-  position:absolute;
-  inset:0;
-  z-index:30;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:28px;
-  background:rgba(5,3,9,.94);
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-  opacity:0;
-  visibility:hidden;
-  transition:opacity 1.5s ease;
-  text-align:center;
-}
-
-.final.show{
-  opacity:1;
-  visibility:visible;
-}
-
-.finalInner{
-  max-width:440px;
-  transform:translateY(25px);
-  transition:transform 1.5s ease;
-}
-
-.final.show .finalInner{
-  transform:translateY(0);
-}
-
-.final .mark{
-  font-size:34px;
-  color:var(--pink);
-  text-shadow:0 0 25px #dc8fc2;
-  margin-bottom:20px;
-}
-
-.final small{
-  font:8px Arial,sans-serif;
-  letter-spacing:4px;
-  color:#aa98b6;
-}
-
-.final h2{
-  font-size:clamp(35px,9vw,54px);
-  font-weight:normal;
-  margin:18px 0 22px;
-}
-
-.final p{
-  color:#d4c7dc;
-  font-size:16px;
-  line-height:1.9;
-  white-space:pre-line;
-}
-
-.signature{
-  color:var(--pink);
-  font-style:italic;
-  font-size:20px;
-  margin-top:25px;
-}
-
-/* ------------------------------
-   PROGRESS
---------------------------------*/
-.progress{
-  position:absolute;
-  top:75px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:12;
-  font:8px Arial,sans-serif;
-  letter-spacing:2px;
-  color:#6f6278;
-  opacity:0;
-  transition:opacity .8s;
-}
-
-.progress.show{
-  opacity:1;
-}
-
-/* ------------------------------
-   MOBILE
---------------------------------*/
-@media(max-height:680px){
-  .core{
-    top:40%;
+  .room-top{
+    padding-top:max(14px,env(safe-area-inset-top));
   }
 
-  .breatheText{
-    top:calc(40% + 105px);
+  .points{
+    padding-top:5px;
   }
 
-  #care{top:20%}
-  #hide{top:20%}
-  #stay{bottom:24%}
-  #tears{bottom:24%}
+  .point{
+    min-height:54px;
+  }
+
+  .point-title{
+    margin-top:4px;
+    font-size:9px;
+  }
+
+  .breath{
+    width:42vw;
+    height:42vw;
+  }
+
+  .intro-text{
+    margin-top:20px;
+  }
+
+  .enter{
+    margin-top:23px;
+  }
+
+  .final-copy{
+    margin-top:22px;
+    line-height:1.7;
+  }
+
+  .signature{
+    margin-top:24px;
+  }
 }
 
-@media(prefers-reduced-motion:reduce){
-  *,*:before,*:after{
-    animation:none!important;
-    transition:none!important;
+/* =========================
+   VERY SMALL WIDTH
+========================= */
+
+@media(max-width:340px){
+
+  .points-grid{
+    gap:6px;
+  }
+
+  .point{
+    padding:9px;
+  }
+
+  .point-title{
+    font-size:8px;
+  }
+
+  .intro-title{
+    font-size:40px;
   }
 }
 </style>
@@ -492,191 +691,212 @@ button{
 
 <body>
 
-<div id="room">
+<div id="app">
 
-  <div class="particles" id="particles"></div>
+  <!-- ======================
+       INTRO
+  ======================= -->
+  <section class="scene active" id="intro">
 
-  <div class="top">
-    <span>FOR MY HAYATI</span>
-    <span class="clock" id="clock">--:--</span>
-  </div>
+    <div class="intro-orb"></div>
 
-  <!-- INTRO -->
+    <div class="intro-content">
 
-  <section class="intro" id="intro">
+      <div class="eyebrow">
+        for my Hayati
+      </div>
 
-    <div class="tiny">MUHAMMAD MADE THIS FOR YOU</div>
+      <h1 class="intro-title">
+        <span>Come.</span>
+        <span class="accent">Rest.</span>
+        <span>Here.</span>
+      </h1>
 
-    <h1>
-      COME<br>
-      <span>REST</span><br>
-      HERE.
-    </h1>
+      <p class="intro-text">
+        You don't have to explain everything tonight.
+        You don't have to hide your tears.
+        Just come inside for a little while.
+      </p>
 
-    <p>
-      You don't have to be strong for me tonight.
-      You don't have to hide your tears.
-      Just come inside for a little while.
-    </p>
+      <button class="enter" id="enterBtn">
+        I'M HERE
+      </button>
 
-    <button class="enter" id="enter">
-      I'M HERE
-    </button>
+    </div>
+  </section>
+
+
+  <!-- ======================
+       MAIN ROOM
+  ======================= -->
+  <section class="scene" id="room">
+
+    <div class="room-top">
+
+      <div class="room-label">
+        a quiet place for you
+      </div>
+
+      <div class="clock" id="clock">
+        --
+      </div>
+
+    </div>
+
+
+    <div class="room-center">
+
+      <div class="breath">
+
+        <div class="breath-core"></div>
+
+        <div class="breath-word" id="breathWord">
+          breathe
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="points">
+
+      <div class="points-grid">
+
+        <button class="point" data-id="1">
+          <div class="point-number">01</div>
+          <div class="point-title">If you feel scared</div>
+        </button>
+
+        <button class="point" data-id="2">
+          <div class="point-number">02</div>
+          <div class="point-title">You don't have to hide</div>
+        </button>
+
+        <button class="point" data-id="3">
+          <div class="point-number">03</div>
+          <div class="point-title">When it feels heavy</div>
+        </button>
+
+        <button class="point" data-id="4">
+          <div class="point-number">04</div>
+          <div class="point-title">For the tears</div>
+        </button>
+
+        <button class="point" data-id="5">
+          <div class="point-number">05</div>
+          <div class="point-title">My dua for you</div>
+        </button>
+
+      </div>
+
+    </div>
 
   </section>
 
 
-  <!-- MAIN EXPERIENCE -->
+  <!-- ======================
+       BOTTOM PANEL
+  ======================= -->
+  <div id="panel">
 
-  <section class="space" id="space">
+    <div class="panel-sheet">
 
-    <div class="progress" id="progress">
-      0 OF 5 MOMENTS DISCOVERED
-    </div>
+      <div class="handle"></div>
 
-    <div class="core" id="core"></div>
-
-    <div class="breatheText">
-      <strong id="breathWord">Breathe.</strong>
-      <span>YOU ARE NOT ALONE IN THIS MOMENT</span>
-    </div>
-
-
-    <!-- DISCOVERY POINTS -->
-
-    <button class="touch" id="care" data-id="care">
-      <div class="dot"></div>
-      <small>IF YOU<br>FEEL SCARED</small>
-    </button>
-
-    <button class="touch" id="hide" data-id="hide">
-      <div class="dot"></div>
-      <small>YOU DON'T<br>HAVE TO HIDE</small>
-    </button>
-
-    <button class="touch" id="stay" data-id="stay">
-      <div class="dot"></div>
-      <small>WHEN THE<br>PAIN FEELS HEAVY</small>
-    </button>
-
-    <button class="touch" id="tears" data-id="tears">
-      <div class="dot"></div>
-      <small>FOR THE<br>TEARS</small>
-    </button>
-
-    <button class="touch" id="dua" data-id="dua">
-      <div class="dot"></div>
-      <small>MY DUA<br>FOR YOU</small>
-    </button>
-
-
-    <!-- MESSAGE -->
-
-    <div class="panel" id="panel">
-
-      <div class="tag" id="panelTag">
-        FOR YOU
+      <div class="panel-kicker" id="panelKicker">
+        for you
       </div>
 
-      <h2 id="panelTitle">
-        I'm here.
+      <h2 class="panel-title" id="panelTitle">
+        Stay here.
       </h2>
 
-      <p id="panelText"></p>
+      <p class="panel-text" id="panelText">
+        You don't have to carry everything at once.
+      </p>
 
-      <button class="close" id="closePanel">
-        LET ME BREATHE
+      <button class="panel-close" id="panelClose">
+        I'M STILL HERE
       </button>
 
     </div>
 
-  </section>
+  </div>
 
 
-  <!-- FINAL -->
+  <!-- ======================
+       FINAL
+  ======================= -->
+  <section class="scene" id="final">
 
-  <section class="final" id="final">
+    <div class="final-glow"></div>
 
-    <div class="finalInner">
+    <div class="final-content">
 
-      <div class="mark">♡</div>
+      <div class="final-small">
+        you made it here
+      </div>
 
-      <small>FROM MUHAMMAD TO HIS HAYATI</small>
+      <h1 class="final-title">
+        <span>You don't</span>
+        <span>have to carry</span>
+        <span class="accent">this alone.</span>
+      </h1>
 
-      <h2>You don't have to carry this alone.</h2>
+      <p class="final-copy">
 
-      <p>
-My love,
+        My love,
 
-I know you're scared.
-And I know there are moments tonight
-when your mind probably feels louder
-than everything around you.
+        I know there are moments when pain makes
+        everything feel frightening.
 
-So listen to me carefully.
+        I wish I could take every bit of it away
+        and carry it for you.
 
-You don't have to pretend you're okay
-just to make me feel better.
+        I can't promise that life will never bring
+        difficult days.
 
-If you need to cry, cry.
-If you're afraid, tell me.
-If you don't know what to say,
-you don't have to say anything.
+        But I can promise you this:
 
-I'll sit with you through the silence too.
+        <strong>
+          your pain will never make you less loved.
+        </strong>
 
-I can't promise you that life will never
-bring us difficult days.
+        You don't have to hide the things that scare you
+        from me.
 
-But I can promise you this:
+        You don't have to pretend you're okay just to
+        protect my heart.
 
-You will never have to wonder whether
-your pain makes you less loved by me.
+        Cry when you need to.
 
-It doesn't.
+        Rest when you need to.
 
-Your tears don't scare me away.
-Your fear doesn't make me love you less.
-A difficult season doesn't change
-what you mean to me.
+        Tell me when you're afraid.
 
-Tonight, let's take everything
-one moment at a time.
+        And when you don't know what to say,
+        you can simply stay.
 
-One breath.
-One prayer.
-One morning.
-Then another.
+        I'll still be here.
 
-And above everything,
-we leave what we cannot control
-with Allah.
+        Praying for you.
+        Caring for you.
+        Loving you.
 
-May Allah ease your pain,
-strengthen your body,
-calm your heart,
-and surround you with His mercy.
+        And asking Allah to bring you ease,
+        strength, healing and peace.
 
-And Hayati...
+        Whatever tomorrow brings,
+        tonight you are not forgotten.
 
-whatever tomorrow brings,
-tonight you have Muhammad here.
-
-Not with perfect answers.
-
-Just here.
-
-Loving you.
-Praying for you.
-And refusing to let you feel
-forgotten in the middle of your pain.
-
-Ameen. 🤲💜
       </p>
 
       <div class="signature">
         Always your Muhammad.
       </div>
+
+      <div class="final-heart"></div>
 
     </div>
 
@@ -687,336 +907,385 @@ Ameen. 🤲💜
 
 <script>
 
-/* --------------------------------
-   CLOCK
--------------------------------- */
+/* =====================================================
+   DATA
+===================================================== */
 
-function updateClock(){
-  document.getElementById("clock").textContent =
-    new Date().toLocaleTimeString([],{
-      hour:"2-digit",
-      minute:"2-digit"
-    });
-}
+const messages = {
 
-updateClock();
-setInterval(updateClock,30000);
+  1:{
+    kicker:"if you're scared",
+    title:"You can be scared.",
+    text:
+      "You don't have to hide that feeling from me. " +
+      "Being afraid doesn't make you weak. " +
+      "If your heart feels frightened tonight, let it. " +
+      "Take one breath. Then another. " +
+      "You don't have to solve tomorrow tonight."
+  },
 
+  2:{
+    kicker:"you don't have to hide",
+    title:"Tell me everything.",
+    text:
+      "The things that hurt. The things that scare you. " +
+      "The tears you don't want anyone to see. " +
+      "You never have to make yourself smaller just " +
+      "because you're afraid of worrying me. " +
+      "I would rather know you're hurting than have you " +
+      "sit with it alone."
+  },
 
-/* --------------------------------
-   PARTICLES
--------------------------------- */
+  3:{
+    kicker:"when it feels heavy",
+    title:"One moment.",
+    text:
+      "Don't carry the whole night at once. " +
+      "Don't carry tomorrow. " +
+      "Don't carry every possibility your mind can imagine. " +
+      "Just this breath. This moment. " +
+      "Then the next one. " +
+      "Sometimes getting through something begins " +
+      "with nothing more than staying for one more moment."
+  },
 
-const particleBox=document.getElementById("particles");
+  4:{
+    kicker:"for the tears",
+    title:"Let them fall.",
+    text:
+      "You don't have to stop yourself from crying for me. " +
+      "If your eyes need to let go, let them. " +
+      "Your tears don't make you a burden. " +
+      "They don't make you difficult to love. " +
+      "If anything, they are simply proof that you're human. " +
+      "And I am still right here."
+  },
 
-for(let i=0;i<32;i++){
-
-  const p=document.createElement("span");
-
-  p.className="particle";
-
-  p.style.left=Math.random()*100+"%";
-  p.style.top=Math.random()*100+"%";
-  p.style.animationDelay=(-Math.random()*8)+"s";
-  p.style.animationDuration=(6+Math.random()*7)+"s";
-
-  particleBox.appendChild(p);
-}
-
-
-/* --------------------------------
-   ENTER EXPERIENCE
--------------------------------- */
-
-const intro=document.getElementById("intro");
-const space=document.getElementById("space");
-const enter=document.getElementById("enter");
-
-enter.addEventListener("click",()=>{
-
-  intro.classList.add("hidden");
-
-  setTimeout(()=>{
-    space.classList.add("visible");
-  },700);
-
-});
-
-
-/* --------------------------------
-   CONTENT
--------------------------------- */
-
-const moments={
-
-care:{
-  tag:"IF YOU FEEL SCARED",
-  title:"Look at me, Hayati.",
-  text:
-`You don't have to hide your fear from me.
-
-I know tonight is difficult.
-I know seeing results and hearing things
-you don't fully understand can make your
-mind imagine the worst.
-
-But breathe, my love.
-
-We don't have to solve tomorrow tonight.
-
-Let's take this one step at a time.
-One result at a time.
-One conversation at a time.
-
-I'm right here with you.`
-},
-
-hide:{
-  tag:"YOU DON'T HAVE TO HIDE",
-  title:"You trusted me.",
-  text:
-`You were scared to show someone.
-
-But you remembered that I am your person,
-and you brought it to me.
-
-Thank you for trusting me with something
-that frightened you.
-
-Nothing you show me is going to make me
-look at you differently.
-
-You don't have to protect me from your pain.
-
-You can let me see it.
-
-You can cry in front of me.
-
-You can be scared in front of me.
-
-You are still my Hayati.`
-},
-
-stay:{
-  tag:"WHEN THE PAIN FEELS HEAVY",
-  title:"Then let me stay.",
-  text:
-`You don't have to be cheerful for me.
-
-You don't have to force yourself to talk.
-
-If today is a quiet day,
-I'll understand the quiet.
-
-If today is a crying day,
-I'll understand the tears.
-
-If today is simply a
-"please stay with me" day,
-
-then that's enough.
-
-I'll stay.
-
-Let's just get through this moment first.`
-},
-
-tears:{
-  tag:"FOR THE TEARS",
-  title:"Let them fall.",
-  text:
-`My love,
-
-you don't need to apologise for crying.
-
-Those tears don't make you weak.
-
-You've been carrying fear, pain,
-questions and uncertainty,
-and sometimes the heart simply needs
-somewhere for all of it to go.
-
-So cry if you need to.
-
-Then breathe.
-
-Wipe your tears when you're ready.
-
-And remember that you are deeply loved.`
-},
-
-dua:{
-  tag:"MY DUA FOR YOU",
-  title:"Ya Allah...",
-  text:
-`Ya Allah,
-
-You know what she is feeling
-even when she cannot explain it.
-
-You know the pain she carries,
-the fear behind her tears,
-and every thought inside her heart.
-
-Please ease her pain.
-
-Give her body strength.
-Give her heart peace.
-Give her mind rest.
-
-Guide the hands and minds of
-everyone caring for her.
-
-Give her clarity where there is confusion
-and comfort where there is fear.
-
-And let her wake to easier days.
-
-Ameen. 🤲`
-}
+  5:{
+    kicker:"my dua for you",
+    title:"May Allah give you ease.",
+    text:
+      "May Allah surround you with mercy. " +
+      "May He ease what hurts, calm what frightens you, " +
+      "give strength to your body and peace to your heart. " +
+      "May every difficult moment become lighter. " +
+      "And may you always remember that you are deeply loved."
+  }
 
 };
 
 
-/* --------------------------------
-   DISCOVERY SYSTEM
--------------------------------- */
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-const touches=document.querySelectorAll(".touch");
-const panel=document.getElementById("panel");
-const panelTag=document.getElementById("panelTag");
-const panelTitle=document.getElementById("panelTitle");
-const panelText=document.getElementById("panelText");
-const closePanel=document.getElementById("closePanel");
-const progress=document.getElementById("progress");
-const core=document.getElementById("core");
+const intro = document.getElementById("intro");
+const room = document.getElementById("room");
+const finalScene = document.getElementById("final");
 
-const discovered=new Set();
+const enterBtn = document.getElementById("enterBtn");
 
-touches.forEach(button=>{
+const panel = document.getElementById("panel");
+const panelKicker = document.getElementById("panelKicker");
+const panelTitle = document.getElementById("panelTitle");
+const panelText = document.getElementById("panelText");
+const panelClose = document.getElementById("panelClose");
 
-  button.addEventListener("click",()=>{
+const points = document.querySelectorAll(".point");
 
-    const id=button.dataset.id;
-    const item=moments[id];
+const clock = document.getElementById("clock");
+const breathWord = document.getElementById("breathWord");
 
-    if(!item)return;
 
-    discovered.add(id);
+/* =====================================================
+   SCENE SWITCHING
+===================================================== */
 
-    button.classList.add("used");
+function showScene(scene){
 
-    panelTag.textContent=item.tag;
-    panelTitle.textContent=item.title;
-    panelText.textContent=item.text;
+  document.querySelectorAll(".scene")
+    .forEach(s => s.classList.remove("active"));
 
-    panel.classList.add("show");
+  scene.classList.add("active");
+}
 
-    progress.classList.add("show");
 
-    progress.textContent =
-      discovered.size+" OF 5 MOMENTS DISCOVERED";
+/* =====================================================
+   INTRO
+===================================================== */
 
-    core.style.transform="translate(-50%,-50%) scale(1.12)";
+enterBtn.addEventListener("click", () => {
 
-    setTimeout(()=>{
-      core.style.transform="translate(-50%,-50%) scale(1)";
-    },700);
+  showScene(room);
+
+  if(navigator.vibrate){
+    navigator.vibrate(12);
+  }
+
+});
+
+
+/* =====================================================
+   CLOCK
+===================================================== */
+
+function updateClock(){
+
+  const now = new Date();
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  const suffix = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours || 12;
+
+  minutes = String(minutes).padStart(2,"0");
+
+  clock.textContent =
+    `${hours}:${minutes} ${suffix}`;
+
+}
+
+updateClock();
+setInterval(updateClock,1000);
+
+
+/* =====================================================
+   BREATHING WORDS
+===================================================== */
+
+const breathingWords = [
+  "breathe",
+  "slow down",
+  "you're here",
+  "one moment",
+  "breathe"
+];
+
+let breathIndex = 0;
+
+setInterval(() => {
+
+  breathIndex =
+    (breathIndex + 1) %
+    breathingWords.length;
+
+  breathWord.style.opacity = "0";
+
+  setTimeout(() => {
+
+    breathWord.textContent =
+      breathingWords[breathIndex];
+
+    breathWord.style.opacity = "";
+
+  },400);
+
+},5000);
+
+
+/* =====================================================
+   PARTICLES
+===================================================== */
+
+function createParticles(){
+
+  for(let i=0;i<28;i++){
+
+    const p = document.createElement("div");
+
+    p.className = "particle";
+
+    p.style.left =
+      Math.random() * 100 + "%";
+
+    p.style.animationDuration =
+      (10 + Math.random() * 16) + "s";
+
+    p.style.animationDelay =
+      (-Math.random() * 20) + "s";
+
+    p.style.opacity =
+      (.15 + Math.random() * .35);
+
+    room.appendChild(p);
+  }
+
+}
+
+createParticles();
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+let opened = new Set();
+
+function openMessage(id){
+
+  const data = messages[id];
+
+  if(!data) return;
+
+  panelKicker.textContent = data.kicker;
+  panelTitle.textContent = data.title;
+  panelText.textContent = data.text;
+
+  panel.classList.add("open");
+
+  opened.add(id);
+
+  points.forEach(point => {
+
+    if(opened.has(point.dataset.id)){
+      point.classList.add("done");
+    }
+
+  });
+
+  if(navigator.vibrate){
+    navigator.vibrate(8);
+  }
+
+}
+
+
+function closePanel(){
+
+  panel.classList.remove("open");
+
+}
+
+
+points.forEach(point => {
+
+  point.addEventListener("click", () => {
+
+    openMessage(point.dataset.id);
 
   });
 
 });
 
 
-closePanel.addEventListener("click",()=>{
-  panel.classList.remove("show");
-});
+panelClose.addEventListener("click", closePanel);
 
 
-/* Tap outside panel to close */
+/* =====================================================
+   TAP OUTSIDE PANEL
+===================================================== */
 
-space.addEventListener("click",(e)=>{
+panel.addEventListener("click", e => {
 
-  if(
-    panel.classList.contains("show") &&
-    e.target===space
-  ){
-    panel.classList.remove("show");
+  if(e.target === panel){
+    closePanel();
   }
 
 });
 
 
-/* --------------------------------
-   BREATHING WORDS
--------------------------------- */
+/* =====================================================
+   ESCAPE KEY
+===================================================== */
 
-const breathWord=document.getElementById("breathWord");
+document.addEventListener("keydown", e => {
 
-const breathing=[
-  "Breathe.",
-  "Slowly.",
-  "You're safe here.",
-  "One moment.",
-  "Again."
-];
+  if(e.key === "Escape"){
+    closePanel();
+  }
 
-let breathIndex=0;
-
-setInterval(()=>{
-
-  breathIndex=(breathIndex+1)%breathing.length;
-
-  breathWord.style.opacity="0";
-
-  setTimeout(()=>{
-    breathWord.textContent=breathing[breathIndex];
-    breathWord.style.opacity="1";
-  },350);
-
-},5000);
+});
 
 
-/* --------------------------------
+/* =====================================================
    FINAL UNLOCK
-   Opens after all five moments
-   have been discovered.
--------------------------------- */
+===================================================== */
 
-const final=document.getElementById("final");
+let finalTriggered = false;
 
-function checkComplete(){
+function checkCompletion(){
 
-  if(discovered.size===5){
+  if(
+    opened.size === 5 &&
+    !finalTriggered
+  ){
 
-    setTimeout(()=>{
+    finalTriggered = true;
 
-      final.classList.add("show");
+    closePanel();
 
-    },1200);
+    setTimeout(() => {
+
+      showScene(finalScene);
+
+    },500);
 
   }
 
 }
 
 
-/* check after every discovery */
+/*
+  We intentionally check completion after the
+  interaction has visually finished.
+*/
 
-touches.forEach(button=>{
+points.forEach(point => {
 
-  button.addEventListener("click",checkComplete);
+  point.addEventListener("click", () => {
+
+    setTimeout(checkCompletion,500);
+
+  });
 
 });
 
 
-/* --------------------------------
-   BACK BUTTON SUPPORT
--------------------------------- */
+/* =====================================================
+   PREVENT ACCIDENTAL PAGE MOVEMENT
+===================================================== */
 
-window.addEventListener("popstate",()=>{
-  panel.classList.remove("show");
-  final.classList.remove("show");
-});
+document.addEventListener(
+  "touchmove",
+  e => {
+
+    if(
+      e.target.closest(".panel-sheet") ||
+      e.target.closest("#final")
+    ){
+      return;
+    }
+
+    e.preventDefault();
+
+  },
+  {passive:false}
+);
+
+
+/* =====================================================
+   HANDLE MOBILE RESIZE
+===================================================== */
+
+function refreshViewport(){
+
+  document.documentElement.style
+    .setProperty(
+      "--vh",
+      `${window.innerHeight * 0.01}px`
+    );
+
+}
+
+refreshViewport();
+
+window.addEventListener(
+  "resize",
+  refreshViewport
+);
 
 </script>
 
